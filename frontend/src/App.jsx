@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react'
+import './App.css'
 
 const API_URL = import.meta.env.VITE_API_URL || ''
 
-export default function App() {
+function LiveTime() {
   const [time, setTime] = useState(null)
   const [error, setError] = useState(null)
 
@@ -14,18 +15,184 @@ export default function App() {
   }, [])
 
   return (
-    <div style={{ fontFamily: 'system-ui, sans-serif', maxWidth: 640, margin: '80px auto', padding: '0 24px', textAlign: 'center' }}>
-      <h1 style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>🚀 Launchpad Example</h1>
-      <p style={{ color: '#666', fontSize: '1.1rem', marginBottom: '2rem' }}>
-        Deployed via Launchpad — zero config, one push.
-      </p>
-      <div style={{ background: '#f4f4f4', borderRadius: 8, padding: '2rem' }}>
-        <p style={{ margin: '0 0 0.5rem', color: '#999', fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Current time from backend</p>
-        {error
-          ? <p style={{ color: '#c00', margin: 0 }}>{error}</p>
-          : <p style={{ fontSize: '1.3rem', fontWeight: 600, margin: 0 }}>{time ?? 'Loading…'}</p>
-        }
+    <div className="live-time">
+      <span className="live-dot" />
+      <span className="live-label">Live from Cloud Run</span>
+      <p className="live-value">{error ?? time ?? 'Loading…'}</p>
+    </div>
+  )
+}
+
+function Step({ n, title, code, children }) {
+  return (
+    <div className="step">
+      <div className="step-num">{n}</div>
+      <div className="step-body">
+        <h3>{title}</h3>
+        <p>{children}</p>
+        {code && <pre><code>{code}</code></pre>}
       </div>
+    </div>
+  )
+}
+
+function Badge({ children }) {
+  return <span className="badge">{children}</span>
+}
+
+export default function App() {
+  return (
+    <div className="page">
+
+      {/* ── Nav ── */}
+      <nav className="nav">
+        <span className="nav-logo">🚀 Launchpad</span>
+        <a className="nav-link" href="https://github.com/bobbydeveaux/launchpad" target="_blank" rel="noreferrer">
+          GitHub →
+        </a>
+      </nav>
+
+      {/* ── Hero ── */}
+      <section className="hero">
+        <p className="hero-eyebrow">Open-source · Zero config · One push</p>
+        <h1 className="hero-title">You commit code.<br />The platform handles the rest.</h1>
+        <p className="hero-sub">
+          Launchpad is a deployment platform delivered as a single GitHub Action.
+          Drop in a <code>launchpad.yaml</code>, add one workflow file, push — and your app
+          is live on GCP with Firebase Hosting and Cloud Run. No console. No Terraform. No secrets.
+        </p>
+        <div className="hero-actions">
+          <a className="btn btn-primary" href="https://github.com/bobbydeveaux/launchpad" target="_blank" rel="noreferrer">View on GitHub</a>
+          <a className="btn btn-secondary" href="https://github.com/bobbydeveaux/launchpad-example" target="_blank" rel="noreferrer">See this example</a>
+        </div>
+        <LiveTime />
+      </section>
+
+      {/* ── How it works ── */}
+      <section className="section">
+        <h2 className="section-title">How it works</h2>
+        <p className="section-sub">Three steps. That's it.</p>
+
+        <div className="steps">
+          <Step n="1" title="Describe your app" code={`name: my-app
+
+frontend:
+  framework: react
+
+backend:
+  language: python
+  port: 8080
+
+database: false`}>
+            Drop a <code>launchpad.yaml</code> in your repo root. Declare what you have — frontend, backend, database. No cloud provider details, no ARNs, no project numbers.
+          </Step>
+
+          <Step n="2" title="Add one workflow file" code={`# .github/workflows/deploy.yml
+jobs:
+  deploy:
+    permissions:
+      id-token: write
+      contents: read
+      pull-requests: write
+    uses: bobbydeveaux/launchpad/\
+.github/workflows/platform.yml@main
+    secrets: inherit`}>
+            That's your entire CI/CD pipeline. The platform workflow handles everything else — building, provisioning, deploying, PR previews.
+          </Step>
+
+          <Step n="3" title="Push">
+            Launchpad detects what changed, builds only what's needed, provisions cloud infrastructure idempotently, and deploys. URLs are posted back to your PR as a comment.
+          </Step>
+        </div>
+      </section>
+
+      {/* ── What gets created ── */}
+      <section className="section section-alt">
+        <h2 className="section-title">What the platform provisions</h2>
+        <p className="section-sub">Everything is created automatically and idempotently on every push.</p>
+        <div className="cards">
+          <div className="card">
+            <div className="card-icon">🌐</div>
+            <h4>Firebase Hosting</h4>
+            <p>Your React / Vue / Next app deployed to a global CDN with a <code>.web.app</code> URL out of the box.</p>
+          </div>
+          <div className="card">
+            <div className="card-icon">⚙️</div>
+            <h4>Cloud Run</h4>
+            <p>Your Python / Go / Node backend containerised and deployed as a fully managed, auto-scaling service.</p>
+          </div>
+          <div className="card">
+            <div className="card-icon">🔐</div>
+            <h4>Workload Identity</h4>
+            <p>GitHub Actions authenticates to GCP via OIDC — no service account keys, no secrets to rotate.</p>
+          </div>
+          <div className="card">
+            <div className="card-icon">👁️</div>
+            <h4>PR Previews</h4>
+            <p>Every pull request gets its own preview deployment. The URL is posted as a PR comment automatically.</p>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Architecture ── */}
+      <section className="section">
+        <h2 className="section-title">Architecture</h2>
+        <p className="section-sub">The operator sets up the platform once. Developers just push.</p>
+        <div className="arch">
+          <div className="arch-col">
+            <h4>Developer repo</h4>
+            <div className="arch-items">
+              <div className="arch-item">launchpad.yaml</div>
+              <div className="arch-item">.github/workflows/deploy.yml</div>
+              <div className="arch-item">frontend/</div>
+              <div className="arch-item">backend/</div>
+            </div>
+          </div>
+          <div className="arch-arrow">→</div>
+          <div className="arch-col">
+            <h4>Launchpad platform</h4>
+            <div className="arch-items">
+              <div className="arch-item">Parse config</div>
+              <div className="arch-item">Detect changes</div>
+              <div className="arch-item">Provision infra (Terraform)</div>
+              <div className="arch-item">Build &amp; deploy</div>
+            </div>
+          </div>
+          <div className="arch-arrow">→</div>
+          <div className="arch-col">
+            <h4>GCP</h4>
+            <div className="arch-items">
+              <div className="arch-item">Firebase Hosting</div>
+              <div className="arch-item">Cloud Run</div>
+              <div className="arch-item">Artifact Registry</div>
+              <div className="arch-item">GCS (TF state)</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Stack ── */}
+      <section className="section section-alt">
+        <h2 className="section-title">This example app</h2>
+        <p className="section-sub">A real full-stack app deployed entirely by Launchpad.</p>
+        <div className="stack">
+          <div className="stack-item"><Badge>Frontend</Badge> React + Vite → Firebase Hosting</div>
+          <div className="stack-item"><Badge>Backend</Badge> Python FastAPI → Cloud Run</div>
+          <div className="stack-item"><Badge>Auth</Badge> Workload Identity Federation (no secrets)</div>
+          <div className="stack-item"><Badge>Config</Badge> 8 lines of launchpad.yaml</div>
+          <div className="stack-item"><Badge>Pipeline</Badge> 9 lines of deploy.yml</div>
+        </div>
+      </section>
+
+      {/* ── Footer ── */}
+      <footer className="footer">
+        <p>
+          Built with <a href="https://github.com/bobbydeveaux/launchpad" target="_blank" rel="noreferrer">Launchpad</a>
+          {' · '}
+          <a href="https://github.com/bobbydeveaux/launchpad-example" target="_blank" rel="noreferrer">View source</a>
+        </p>
+      </footer>
+
     </div>
   )
 }
