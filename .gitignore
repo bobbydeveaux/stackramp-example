@@ -2,3 +2,4 @@ node_modules/
 dist/
 .env
 .env.local
+# keep package-lock.json committed
