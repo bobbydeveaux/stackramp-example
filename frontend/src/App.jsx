@@ -88,11 +88,13 @@ frontend:
   framework: react
 
 backend:
-  language: python
+  language: go
   port: 8080
 
-database: false`}>
-            Drop a <code>stackramp.yaml</code> in your repo root. Declare what you have — frontend, backend, database. No cloud provider details, no ARNs, no project numbers.
+database: postgres  # optional — omit or set false to skip
+
+storage: gcs        # optional — provisions a GCS bucket`}>
+            Drop a <code>stackramp.yaml</code> in your repo root. Declare what you have — frontend, backend, database, storage. No cloud provider details, no ARNs, no project numbers.
           </Step>
 
           <Step n="2" title="Add one workflow file" code={`# .github/workflows/deploy.yml
@@ -135,9 +137,29 @@ jobs:
             <p>GitHub Actions authenticates to GCP via OIDC — no service account keys, no secrets to rotate.</p>
           </div>
           <div className="card">
+            <div className="card-icon">🗝️</div>
+            <h4>Secret Manager</h4>
+            <p>Platform-level secrets (API keys, credentials) are stored once in GCP Secret Manager and injected automatically into every Cloud Run deployment — no GitHub secrets required.</p>
+          </div>
+          <div className="card">
+            <div className="card-icon">🐘</div>
+            <h4>Cloud SQL (Postgres)</h4>
+            <p>Set <code>database: postgres</code> and the platform provisions a per-app database, generates credentials, stores them in Secret Manager, and mounts <code>DATABASE_URL</code> into Cloud Run.</p>
+          </div>
+          <div className="card">
+            <div className="card-icon">🪣</div>
+            <h4>GCS Storage</h4>
+            <p>Set <code>storage: gcs</code> to get a provisioned Cloud Storage bucket with the bucket name injected as <code>GCS_BUCKET_NAME</code>.</p>
+          </div>
+          <div className="card">
             <div className="card-icon">👁️</div>
             <h4>PR Previews</h4>
             <p>Every pull request gets its own preview deployment. The URL is posted as a PR comment automatically.</p>
+          </div>
+          <div className="card">
+            <div className="card-icon">🌍</div>
+            <h4>Custom Domains</h4>
+            <p>Set <code>domain: myapp.io</code> or configure a base domain in bootstrap — every app gets <code>appname.yourdomain.io</code> with DNS and SSL handled automatically.</p>
           </div>
         </div>
       </section>
@@ -172,8 +194,11 @@ jobs:
             <div className="arch-items">
               <div className="arch-item">Firebase Hosting</div>
               <div className="arch-item">Cloud Run</div>
+              <div className="arch-item">Cloud SQL (Postgres)</div>
+              <div className="arch-item">Secret Manager</div>
               <div className="arch-item">Artifact Registry</div>
-              <div className="arch-item">GCS (TF state)</div>
+              <div className="arch-item">Cloud Storage</div>
+              <div className="arch-item">Cloud DNS</div>
             </div>
           </div>
         </div>
@@ -192,8 +217,9 @@ jobs:
           <div className="stack-item"><Badge>DNS</Badge> Cloud DNS zone provisioned by bootstrap, A records by platform Terraform</div>
           <div className="stack-item"><Badge>SSL</Badge> Issued automatically by Firebase / Let's Encrypt</div>
           <div className="stack-item"><Badge>Auth</Badge> Workload Identity Federation — zero secrets stored anywhere</div>
-          <div className="stack-item"><Badge>Config</Badge> <a href="https://github.com/bobbydeveaux/stackramp-example/blob/main/stackramp.yaml" target="_blank" rel="noreferrer">8 lines of stackramp.yaml</a></div>
-          <div className="stack-item"><Badge>Pipeline</Badge> <a href="https://github.com/bobbydeveaux/stackramp-example/blob/main/.github/workflows/deploy.yml" target="_blank" rel="noreferrer">9 lines of deploy.yml</a></div>
+          <div className="stack-item"><Badge>Secrets</Badge> Platform API keys stored once in GCP Secret Manager, auto-injected into Cloud Run</div>
+          <div className="stack-item"><Badge>Config</Badge> <a href="https://github.com/bobbydeveaux/stackramp-example/blob/main/stackramp.yaml" target="_blank" rel="noreferrer">stackramp.yaml</a></div>
+          <div className="stack-item"><Badge>Pipeline</Badge> <a href="https://github.com/bobbydeveaux/stackramp-example/blob/main/.github/workflows/deploy.yml" target="_blank" rel="noreferrer">deploy.yml</a></div>
         </div>
       </section>
 
