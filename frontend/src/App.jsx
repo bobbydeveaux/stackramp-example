@@ -89,7 +89,6 @@ frontend:
 
 backend:
   language: go
-  port: 8080
 
 database: postgres  # optional — omit or set false to skip
 

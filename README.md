@@ -77,7 +77,7 @@ frontend:
 backend:
   language: python        # python | go | node
   dir: backend            # directory containing backend source
-  port: 8080              # port your app listens on
+  port: 8080              # optional — defaults to 8080 (matches platform Dockerfiles)
   memory: 512Mi           # optional, Cloud Run memory allocation
   cpu: "1"                # optional, Cloud Run CPU allocation
 
