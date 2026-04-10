@@ -58,6 +58,19 @@ cp terraform.tfvars.example dev.tfvars
         managed zone. Point your domain's nameservers at the outputted nameservers at your registrar
         before deploying any apps with custom domains.
       </Callout>
+
+      <h2>Workload Identity Federation</h2>
+      <p>
+        The bootstrap creates a Workload Identity Federation (WIF) pool that trusts GitHub Actions
+        OIDC tokens. The trust is scoped to the <code>github_owner</code> set in your tfvars —
+        any repo owned by that org or user can authenticate to GCP automatically:
+      </p>
+      <Code>{`# attribute_condition in the WIF provider:
+attribute.repository_owner == 'your-github-org'`}</Code>
+      <p>
+        This means any new repo in your org that adds the StackRamp deploy workflow will
+        authenticate to GCP out of the box — no per-repo IAM configuration needed.
+      </p>
     </DocPage>
   )
 }
