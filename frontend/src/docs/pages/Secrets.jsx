@@ -12,8 +12,9 @@ export default function Secrets() {
       <p>Secrets are a two-step process:</p>
       <ol>
         <li><strong>Platform operator</strong> defines which secrets exist in the bootstrap <code>tfvars</code> file. This creates empty "shell" secrets in Secret Manager.</li>
-        <li><strong>App developer</strong> populates the secret values via <code>gcloud</code> or the GCP Console.</li>
+        <li><strong>Platform operator</strong> populates the secret values via <code>gcloud</code> or the GCP Console.</li>
       </ol>
+      <p>App developers don't need to touch secrets at all — the platform team handles both steps.</p>
 
       <h2>Step 1: Define secrets (platform operator)</h2>
       <p>
@@ -33,7 +34,7 @@ platform_secrets = [
         Each secret is created per app and per environment using the naming convention below.
       </p>
 
-      <h2>Step 2: Set values (app developer)</h2>
+      <h2>Step 2: Set values (platform operator)</h2>
       <p>
         Populate the secret with an actual value:
       </p>
