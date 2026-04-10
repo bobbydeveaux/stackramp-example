@@ -38,7 +38,7 @@ backend:
       <Table
         headers={['STACKRAMP_IAP_DOMAIN', 'Who can access']}
         rows={[
-          ['bobbyjason.co.uk', 'Any Google account @bobbyjason.co.uk'],
+          ['yourcompany.com', 'Any Google account @yourcompany.com'],
           ['(unset)', 'Any authenticated Google account'],
         ]}
       />
