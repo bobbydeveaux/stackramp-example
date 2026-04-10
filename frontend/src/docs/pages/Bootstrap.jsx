@@ -24,13 +24,25 @@ cp terraform.tfvars.example dev.tfvars
         plan, and apply. It prints the GitHub Variables to set at the end.
       </p>
 
-      <h2>Single platform (current)</h2>
+      <h2>Dev vs Prod bootstrap</h2>
+      <p>
+        The bootstrap supports <code>dev</code> and <code>prod</code> environments. App developers
+        control their own dev/prod environments (e.g. <code>my-app-dev</code>, <code>my-app-prod</code>)
+        within whichever platform you deploy — the platform environment is separate from app environments.
+      </p>
+      <p>
+        Use <code>./bootstrap.sh dev</code> to test the platform setup and validate changes.
+        Then run <code>./bootstrap.sh prod</code> for the real deployment. The GitHub Variables
+        you set at the org level should be the outputs from <code>bootstrap.sh prod</code>.
+      </p>
+      <Code>{`# Test platform changes
+./bootstrap.sh dev
+
+# Deploy the real platform — use THESE outputs for GitHub Variables
+./bootstrap.sh prod`}</Code>
       <Callout type="info">
-        Currently, StackRamp uses a single GCP project for both <code>dev</code> and <code>prod</code> app
-        environments. One <code>bootstrap.sh dev</code> run, one set of GitHub Variables. Both{' '}
-        <code>my-app-dev</code> and <code>my-app-prod</code> Cloud Run services live in the same
-        project, isolated by naming convention. A future version will support separate platform
-        projects per environment for billing separation and stricter IAM boundaries.
+        A future version will support fully separate platform projects per environment (different
+        GCP projects for dev and prod platforms) for billing separation and stricter IAM boundaries.
       </Callout>
 
       <h2>Set GitHub Variables</h2>
