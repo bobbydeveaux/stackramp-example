@@ -72,6 +72,7 @@ frontend:
   framework: react        # react | vue | nextjs | static | none
   dir: frontend           # directory containing frontend source
   node_version: "20"      # optional, defaults to 20 (or reads .nvmrc)
+  sso: true               # optional — deploy to Cloud Run behind IAP instead of Firebase Hosting
 
 # ── Backend ─────────────────────────────────────────────────────────────────
 backend:
@@ -80,6 +81,7 @@ backend:
   port: 8080              # optional — defaults to 8080 (matches platform Dockerfiles)
   memory: 512Mi           # optional, Cloud Run memory allocation
   cpu: "1"                # optional, Cloud Run CPU allocation
+  sso: true               # optional — restrict access via IAP (requires platform IAP bootstrap)
 
 # ── Database ────────────────────────────────────────────────────────────────
 # Provisions a database within the platform's shared Cloud SQL Postgres instance.
@@ -111,6 +113,24 @@ domain: myapp.io
 ### Secrets
 - **Platform-injectable secrets** — the platform team manages secrets in GCP Secret Manager (labelled `platform-inject=true`); they are automatically discovered and mounted into every Cloud Run deployment — no per-app config or workflow changes needed
 - **Secrets never touch CI** — all secrets are mounted directly from Secret Manager into Cloud Run at runtime, never read by the GitHub Actions runner
+
+### SSO / Identity-Aware Proxy (IAP)
+- **Google IAP** — add `sso: true` to your frontend or backend config to deploy behind IAP; only users in your allowed domain can access the app
+- **User identity in your app** — IAP injects headers into every request that reaches your service:
+  - `X-Goog-Authenticated-User-Email` — the authenticated user's email (e.g. `accounts.google.com:alice@example.com`)
+  - `X-Goog-Authenticated-User-ID` — a stable user identifier
+  - `X-Goog-IAP-JWT-Assertion` — a signed JWT containing the full identity claim
+- **Reading identity server-side** — in a Next.js API route or middleware:
+  ```ts
+  const email = request.headers.get('x-goog-authenticated-user-email')
+  const jwt   = request.headers.get('x-goog-iap-jwt-assertion')
+  ```
+  In a Python backend:
+  ```python
+  email = request.headers.get("x-goog-authenticated-user-email")
+  jwt   = request.headers.get("x-goog-iap-jwt-assertion")
+  ```
+- **JWT verification** — for production use, verify the JWT signature against Google's public keys rather than trusting headers alone. See [Google's IAP documentation](https://cloud.google.com/iap/docs/signed-headers-howto) for verification libraries and examples
 
 ### Domains & Networking
 - **Custom domains** — apex and subdomain support, with automatic DNS record management via Cloud DNS
